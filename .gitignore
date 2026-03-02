@@ -1,0 +1,101 @@
+##################################
+# Python
+##################################
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+##################################
+# Virtual Environment
+##################################
+venv/
+env/
+ENV/
+.venv/
+
+##################################
+# Django
+##################################
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+*.pot
+
+##################################
+# Migrations (optional)
+##################################
+# Uncomment if you DON'T want to track migrations
+# */migrations/
+# !*/migrations/__init__.py
+
+##################################
+# Environment Variables
+##################################
+.env
+.env.*
+*.env
+
+##################################
+# VS Code
+##################################
+.vscode/
+
+##################################
+# PyCharm
+##################################
+.idea/
+
+##################################
+# OS Files
+##################################
+.DS_Store
+Thumbs.db
+
+##################################
+# Antigravity / OpenSpec
+##################################
+.openspec/
+.antigravity/
+agent_logs/
+ai_cache/
+generated_specs/
+node_modules/
+
+##################################
+# Node (if frontend build exists)
+##################################
+node_modules/
+package-lock.json
+yarn.lock
+dist/
+build/
+
+##################################
+# Testing / Coverage
+##################################
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+##################################
+# Type checking
+##################################
+.mypy_cache/
+.dmypy.json
+pyre/
+
+##################################
+# Misc
+##################################
+*.swp
+*.swo
+*.bak
+.agent/
