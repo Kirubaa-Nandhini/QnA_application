@@ -153,3 +153,4 @@ if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
     print("WARNING: Email credentials are missing from environment variables!")
 
 DEFAULT_FROM_EMAIL = f"Q&A Platform <{EMAIL_HOST_USER}>"
+
