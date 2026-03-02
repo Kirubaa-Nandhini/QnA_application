@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ question.title }} - Q&A Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- Question Header -->
+    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+        <div class="flex justify-between items-start mb-6">
+            <div class="flex flex-wrap gap-2">
+                {% for tag in question.tags.all %}
+                <span
+                    class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    {{ tag.name }}
+                </span>
+                {% endfor %}
+            </div>
+            <div class="flex items-center space-x-2 text-xs text-slate-400 font-medium">
+                <span>Asked {{ question.created_at|timesince }} ago</span>
+                {% if question.created_at != question.updated_at %}
+                <span>• Updated {{ question.updated_at|timesince }} ago</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight mb-6">{{ question.title }}</h1>
+
+        <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed text-lg mb-8">
+            {{ question.description|linebreaks }}
+        </div>
+
+
+        <div class="flex items-center justify-between pt-8 border-t border-slate-100">
+            <div class="flex items-center space-x-4">
+                <div
+                    class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-indigo-600 font-black text-xl">
+                    {{ question.author.username.0|upper }}</div>
+                <div>
+                    <p class="text-slate-900 font-bold">{{ question.author.username }}</p>
+                    <p class="text-slate-500 text-xs font-medium">Member since {{ question.author.date_joined|date:"M Y"}}
+                        </p>
+                </div>
+            </div>
+
+            {% if user == question.author %}
+            <div class="flex space-x-2">
+                <a href="{% url 'question_update' question.slug %}"
+                    class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-100 transition">Edit</a>
+                <a href="{% url 'question_delete' question.slug %}"
+                    class="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-rose-100 transition">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Placeholder for Answers -->
+    <div class="space-y-6">
+        <h2 class="text-2xl font-bold text-slate-900 px-4">0 Answers</h2>
+        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-16 text-center">
+            <p class="text-slate-400 font-medium mb-4">No answers yet. Share your knowledge!</p>
+            {% if user.is_authenticated %}
+            <button
+                class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">Post
+                an Answer</button>
+            {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="text-indigo-600 font-bold hover:underline">Log in
+                to answer</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
