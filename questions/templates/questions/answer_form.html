@@ -1,24 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.instance.pk %}Edit Question{% else %}Ask a Question{% endif %} - Q&A Platform{% endblock %}
+{% block title %}Edit Answer - Q&A Platform{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
     <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-200">
         <h1 class="text-3xl font-black text-slate-900 mb-8 tracking-tight text-center">
-            {% if form.instance.pk %}Edit your question{% else %}Ask a new question{% endif %}
+            Edit your answer
         </h1>
 
         <form method="POST" class="space-y-6">
             {% csrf_token %}
-
             {% for field in form %}
             <div class="mb-6">
                 <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">
                     {{ field.label }}
                 </label>
 
-                {% if field.field.widget.input_type == 'textarea' %}
                 <!-- Markdown Toolbar -->
                 <div
                     class="flex items-center space-x-2 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-lg overflow-x-auto">
@@ -51,19 +49,8 @@
                     </button>
                 </div>
 
-                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}"
-                    rows="{{ field.field.widget.attrs.rows }}" placeholder="{{ field.field.widget.attrs.placeholder }}"
+                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="10"
                     class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">{{ field.value|default:'' }}</textarea>
-                {% else %}
-                <input name="{{ field.name }}" id="{{ field.id_for_label }}"
-                    type="{{ field.field.widget.input_type|default:'text' }}" value="{{ field.value|default:'' }}"
-                    class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}">
-                {% endif %}
-
-                {% if field.help_text %}
-                <p class="text-[10px] text-slate-400 mt-2">{{ field.help_text }}</p>
-                {% endif %}
 
                 {% if field.errors %}
                 {% for error in field.errors %}
@@ -73,34 +60,34 @@
             </div>
             {% endfor %}
 
+            <script>
+                function insertMarkdown(fieldId, startTag, endTag = '') {
+                    const textarea = document.getElementById(fieldId);
+                    const startPos = textarea.selectionStart;
+                    const endPos = textarea.selectionEnd;
+                    const text = textarea.value;
+                    const selectedText = text.substring(startPos, endPos);
+
+                    const replacement = startTag + selectedText + endTag;
+                    textarea.value = text.substring(0, startPos) + replacement + text.substring(endPos);
+
+                    textarea.focus();
+                    const newCursorPos = (selectedText.length === 0 && endTag.length > 0)
+                        ? startPos + startTag.length
+                        : startPos + replacement.length;
+                    textarea.setSelectionRange(newCursorPos, newCursorPos);
+                }
+            </script>
+
             <div class="pt-6 border-t border-slate-100 flex items-center justify-center space-x-6">
-                <a href="{% url 'question_list' %}"
+                <a href="{% url 'question_detail' object.question.pk %}"
                     class="text-sm font-bold text-slate-500 hover:text-slate-900 transition">Cancel</a>
                 <button type="submit"
                     class="bg-indigo-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg transform hover:-translate-y-0.5">
-                    {% if form.instance.pk %}Update Question{% else %}Post Question{% endif %}
+                    Update Answer
                 </button>
             </div>
         </form>
-
-        <script>
-            function insertMarkdown(fieldId, startTag, endTag = '') {
-                const textarea = document.getElementById(fieldId);
-                const startPos = textarea.selectionStart;
-                const endPos = textarea.selectionEnd;
-                const text = textarea.value;
-                const selectedText = text.substring(startPos, endPos);
-
-                const replacement = startTag + selectedText + endTag;
-                textarea.value = text.substring(0, startPos) + replacement + text.substring(endPos);
-
-                textarea.focus();
-                const newCursorPos = (selectedText.length === 0 && endTag.length > 0)
-                    ? startPos + startTag.length
-                    : startPos + replacement.length;
-                textarea.setSelectionRange(newCursorPos, newCursorPos);
-            }
-        </script>
     </div>
 </div>
 {% endblock %}

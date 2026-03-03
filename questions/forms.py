@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question, Tag
+from .models import Question, Tag, Answer
 from django.utils.text import slugify
 
 class QuestionForm(forms.ModelForm):
@@ -44,3 +44,11 @@ class QuestionForm(forms.ModelForm):
                 instance.tags.add(tag)
                 
         return instance
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Write your answer here...'}),
+        }
