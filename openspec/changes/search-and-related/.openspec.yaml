@@ -1,0 +1,17 @@
+name: search-and-related
+description: "Implement basic keyword search (icontains) and a tag-based 'Related Questions' sidebar on the detail page"
+status: proposed
+artifacts:
+  proposal:
+    outputPath: proposal.md
+    status: todo
+  design:
+    outputPath: design.md
+    status: todo
+    dependencies: [proposal]
+  tasks:
+    outputPath: tasks.md
+    status: todo
+    dependencies: [design]
+apply:
+  requires: [tasks]
