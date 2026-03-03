@@ -1,0 +1,24 @@
+<div class="flex items-center space-x-1 voting-controls" data-object-id="{{ obj.id }}"
+    data-content-type-id="{{ content_type_id }}">
+    <!-- Quora-style Upvote Button -->
+    <div class="flex items-center bg-slate-100 rounded-full hover:bg-slate-200 transition">
+        <button type="button" onclick="handleVote('{{ content_type_id }}', '{{ obj.id }}', 1)"
+            class="vote-btn upvote flex items-center space-x-2 px-4 py-1.5 rounded-l-full border-r border-slate-200 group {% if user_vote == 1 %}bg-indigo-50 text-indigo-600{% else %}text-slate-700{% endif %}"
+            title="Upvote">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path>
+            </svg>
+            <span class="text-sm font-bold">Upvote</span>
+            <span class="w-px h-3 bg-slate-300 mx-1"></span>
+            <span class="score text-sm font-black">{{ obj.score }}</span>
+        </button>
+
+        <button type="button" onclick="handleVote('{{ content_type_id }}', '{{ obj.id }}', -1)"
+            class="vote-btn downvote px-3 py-1.5 rounded-r-full hover:bg-slate-300 transition group {% if user_vote == -1 %}bg-rose-50 text-rose-600{% else %}text-slate-600{% endif %}"
+            title="Downvote">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+    </div>
+</div>

@@ -12,4 +12,7 @@ urlpatterns = [
     path('<int:pk>/answer/', views.AnswerCreateView.as_view(), name='answer_create'),
     path('answer/<int:pk>/edit/', views.AnswerUpdateView.as_view(), name='answer_update'),
     path('answer/<int:pk>/delete/', views.AnswerDeleteView.as_view(), name='answer_delete'),
+    # Community Engagement
+    path('vote/', views.VoteToggleView.as_view(), name='vote_toggle'),
+    path('comment/', views.CommentCreateView.as_view(), name='comment_create'),
 ]
