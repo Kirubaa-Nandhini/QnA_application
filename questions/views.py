@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from .models import Question, Tag, Answer
 from .forms import QuestionForm, AnswerForm
 
+from django.db.models import Count
+
 class QuestionListView(ListView):
     model = Question
     template_name = 'questions/question_list.html'
@@ -12,7 +14,9 @@ class QuestionListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().annotate(
+            num_answers=Count('answers')
+        )
         tag_name = self.request.GET.get('tag')
         sort = self.request.GET.get('sort', 'newest')
         

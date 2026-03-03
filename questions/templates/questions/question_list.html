@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load markdown_extras %}
 
 {% block title %}Questions - Q&A Platform{% endblock %}
 
@@ -81,7 +80,7 @@
                     <span class="text-slate-600 font-medium">{{ question.author.username }}</span>
                 </div>
                 <div class="flex space-x-4 font-bold text-slate-400">
-                    <span>{{ question.answers.count }} Answers</span>
+                    <span>{{ question.num_answers }} Answers</span>
                     <span>0 Votes</span>
                 </div>
             </div>

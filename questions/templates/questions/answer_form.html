@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Edit Answer - Q&A Platform{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'js/markdown_editor.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
@@ -59,25 +64,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
-            <script>
-                function insertMarkdown(fieldId, startTag, endTag = '') {
-                    const textarea = document.getElementById(fieldId);
-                    const startPos = textarea.selectionStart;
-                    const endPos = textarea.selectionEnd;
-                    const text = textarea.value;
-                    const selectedText = text.substring(startPos, endPos);
-
-                    const replacement = startTag + selectedText + endTag;
-                    textarea.value = text.substring(0, startPos) + replacement + text.substring(endPos);
-
-                    textarea.focus();
-                    const newCursorPos = (selectedText.length === 0 && endTag.length > 0)
-                        ? startPos + startTag.length
-                        : startPos + replacement.length;
-                    textarea.setSelectionRange(newCursorPos, newCursorPos);
-                }
-            </script>
 
             <div class="pt-6 border-t border-slate-100 flex items-center justify-center space-x-6">
                 <a href="{% url 'question_detail' object.question.pk %}"

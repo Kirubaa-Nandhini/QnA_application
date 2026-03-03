@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load markdown_extras %}
+{% load static %}
+
+{% block extra_head %}
+<script src="{% static 'js/markdown_editor.js' %}"></script>
+{% endblock %}
 
 {% block title %}{{ question.title }} - Q&A Platform{% endblock %}
 
@@ -38,8 +43,7 @@
                     {{ question.author.username.0|upper }}</div>
                 <div>
                     <p class="text-slate-900 font-bold">{{ question.author.username }}</p>
-                    <p class="text-slate-500 text-xs font-medium">Member since {{ question.author.date_joined|date:"M Y"}}
-                        
+                    <p class="text-slate-500 text-xs font-medium">Member since {{ question.author.date_joined|date:"M Y"}}       
                     </p>
                 </div>
             </div>
@@ -151,24 +155,6 @@
             </button>
         </form>
 
-        <script>
-            function insertMarkdown(fieldId, startTag, endTag = '') {
-                const textarea = document.getElementById(fieldId);
-                const startPos = textarea.selectionStart;
-                const endPos = textarea.selectionEnd;
-                const text = textarea.value;
-                const selectedText = text.substring(startPos, endPos);
-
-                const replacement = startTag + selectedText + endTag;
-                textarea.value = text.substring(0, startPos) + replacement + text.substring(endPos);
-
-                textarea.focus();
-                const newCursorPos = (selectedText.length === 0 && endTag.length > 0)
-                    ? startPos + startTag.length
-                    : startPos + replacement.length;
-                textarea.setSelectionRange(newCursorPos, newCursorPos);
-            }
-        </script>
         {% else %}
         <div class="text-center py-4">
             <p class="text-slate-500 mb-4">You must be logged in to answer this question.</p>
