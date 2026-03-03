@@ -56,3 +56,7 @@ def get_user_vote(obj, user):
     if hasattr(obj, "get_user_vote"):
         return obj.get_user_vote(user)
     return 0
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

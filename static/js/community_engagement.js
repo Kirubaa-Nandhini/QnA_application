@@ -1,5 +1,10 @@
 function handleVote(contentTypeId, objectId, value) {
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfTokenEl = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfTokenEl) {
+        alert("Please login to vote.");
+        return;
+    }
+    const csrftoken = csrfTokenEl.value;
 
     fetch('/questions/vote/', {
         method: 'POST',

@@ -33,7 +33,9 @@
         <div class="flex items-center justify-between mt-8 pt-4 border-t border-slate-100">
             <div class="flex items-center space-x-6">
                 <!-- Quora-style Voting Pill -->
-                {% include 'questions/includes/voting_controls.html' with obj=question content_type_id=question_ct user_vote=question|get_user_vote:user %}
+                {% with vote_key="q_"|add:question.id|stringformat:"s" %}
+                {% include 'questions/includes/voting_controls.html' with obj=question content_type_id=question_ct user_vote=user_votes|get_item:vote_key %}
+                {% endwith %}
 
         <div class="flex items-center justify-between pt-8 border-t border-slate-100">
             <div class="flex items-center space-x-4">
@@ -85,7 +87,7 @@
                     <div class="flex items-center space-x-2">
                         <span class="text-sm font-black text-slate-900 hover:underline cursor-pointer">
                             {{answer.author.username }}</span>
-                        <span class="text-[10px] text-slate-400 font-bold">• Answered {{ answer.created_at|date:"M d, Y"}}</span>
+                        <span class="text-[10px] text-slate-400 font-bold">• Answered {{ answer.created_at|date:"M d,Y"}}</span>
                     </div>
                 </div>
             </div>
@@ -97,7 +99,9 @@
             <!-- Answer Action Bar -->
             <div class="flex items-center justify-between pt-4 border-t border-slate-50">
                 <div class="flex items-center space-x-6">
-                    {% include 'questions/includes/voting_controls.html' with obj=answer content_type_id=answer_ct user_vote=answer|get_user_vote:user %}
+                    {% with vote_key="a_"|add:answer.id|stringformat:"s" %}
+                    {% include 'questions/includes/voting_controls.html' with obj=answer content_type_id=answer_ct user_vote=user_votes|get_item:vote_key %}
+                    {% endwith %}
 
                     {% if user == answer.author %}
                     <div class="flex space-x-3">

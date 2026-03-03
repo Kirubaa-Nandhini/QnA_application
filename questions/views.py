@@ -15,7 +15,11 @@ class VoteToggleView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         content_type_id = request.POST.get('content_type_id')
         object_id = request.POST.get('object_id')
-        vote_value = int(request.POST.get('value', 0))
+        
+        try:
+            vote_value = int(request.POST.get('value', 0))
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'Invalid vote value'}, status=400)
 
         if vote_value not in [1, -1]:
             return JsonResponse({'error': 'Invalid vote value'}, status=400)
@@ -24,7 +28,7 @@ class VoteToggleView(LoginRequiredMixin, View):
         obj = get_object_or_404(content_type.model_class(), id=object_id)
 
         # check if it is the author trying to vote
-        if obj.author == request.user:
+        if hasattr(obj, 'author') and obj.author == request.user:
             return JsonResponse({'error': 'You cannot vote on your own content'}, status=403)
 
         vote, created = Vote.objects.get_or_create(
@@ -65,8 +69,8 @@ class CommentCreateView(LoginRequiredMixin, View):
         content_type = get_object_or_404(ContentType, id=content_type_id)
         
         parent_comment = None
-        if parent_id:
-            parent_comment = get_object_or_404(Comment, id=parent_id)
+        if parent_id and str(parent_id).isdigit():
+            parent_comment = Comment.objects.filter(id=parent_id).first()
 
         Comment.objects.create(
             user=request.user,
@@ -116,9 +120,28 @@ class QuestionDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        question = self.get_object()
+        user = self.request.user
+        
         context['answer_form'] = AnswerForm()
         context['question_ct'] = ContentType.objects.get_for_model(Question).id
         context['answer_ct'] = ContentType.objects.get_for_model(Answer).id
+        
+        # Performance: Pre-fetch current user's votes to avoid N+1 problem in template
+        user_votes = {}
+        if user.is_authenticated:
+            # Fetch votes for the question
+            q_vote = Vote.objects.filter(user=user, content_type_id=context['question_ct'], object_id=question.id).first()
+            if q_vote:
+                user_votes[f"q_{question.id}"] = q_vote.value
+                
+            # Fetch votes for all answers in one query
+            answer_ids = question.answers.values_list('id', flat=True)
+            a_votes = Vote.objects.filter(user=user, content_type_id=context['answer_ct'], object_id__in=answer_ids)
+            for v in a_votes:
+                user_votes[f"a_{v.object_id}"] = v.value
+                
+        context['user_votes'] = user_votes
         return context
 
 class QuestionCreateView(LoginRequiredMixin, CreateView):
