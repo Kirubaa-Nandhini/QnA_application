@@ -11,16 +11,31 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # Manual fallback if python-dotenv is not installed
+    env_path = BASE_DIR / '.env'
+    if env_path.exists():
+        with open(env_path) as f:
+            for line in f:
+                if line.strip() and not line.startswith('#'):
+                    key, value = line.strip().split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip("'").strip('"')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a*1kgj+-=+e_)76)v8ml8%fl$m)7c*4$f1j=u$i&yxptsin#8('
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'questions',
 ]
 
 LOGIN_REDIRECT_URL = 'home'
@@ -130,6 +146,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'nandhiniipalanisamy81@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'mkiwcwlbyajmsqvl'  # Replace with your app password
-DEFAULT_FROM_EMAIL = 'Q&A Platform <nandhiniipalanisamy81@gmail.com>'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    print("WARNING: Email credentials are missing from environment variables!")
+
+DEFAULT_FROM_EMAIL = f"Q&A Platform <{EMAIL_HOST_USER}>"
