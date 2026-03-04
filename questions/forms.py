@@ -3,24 +3,25 @@ from .models import Question, Tag
 from django.utils.text import slugify
 
 class QuestionForm(forms.ModelForm):
-    tags = forms.CharField(
+    tags_input = forms.CharField(
         max_length=255, 
         required=False, 
+        label="Tags",
         help_text="Enter tags separated by commas (e.g. python, django, coding)",
         widget=forms.TextInput(attrs={'placeholder': 'e.g. python, django, web'})
     )
 
     class Meta:
         model = Question
-        fields = ['title', 'description', 'tags']
+        fields = ['title', 'description']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Describe your question in detail... (Markdown supported)'}),
+            'description': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Describe your question in detail...'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.pk:
-            self.fields['tags'].initial = ", ".join([t.name for t in self.instance.tags.all()])
+            self.fields['tags_input'].initial = ", ".join([t.name for t in self.instance.tags.all()])
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -28,7 +29,7 @@ class QuestionForm(forms.ModelForm):
         if commit:
             instance.save()
             # Handle tags
-            tags_str = self.cleaned_data.get('tags', '')
+            tags_str = self.cleaned_data.get('tags_input', '')
             tag_names = [t.strip() for t in tags_str.split(',') if t.strip()]
             
             # Clear existing tags
@@ -36,16 +37,9 @@ class QuestionForm(forms.ModelForm):
             for name in tag_names:
                 # Normalize name to lowercase for consistency
                 normalized_name = name.lower()
-                tag_slug = slugify(normalized_name) or 'tag'
                 
-                # Check for existing tag by slug or name
-                tag = Tag.objects.filter(slug=tag_slug).first()
-                if not tag:
-                    tag = Tag.objects.filter(name=normalized_name).first()
-                
-                if not tag:
-                    # Create new tag; the model's save() will handle uniqueness
-                    tag = Tag.objects.create(name=normalized_name)
+                # Check for existing tag or create it atomically
+                tag, created = Tag.objects.get_or_create(name=normalized_name)
                     
                 instance.tags.add(tag)
                 

@@ -13,11 +13,11 @@ class QuestionListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        tag_slug = self.request.GET.get('tag')
+        tag_name = self.request.GET.get('tag')
         sort = self.request.GET.get('sort', 'newest')
         
-        if tag_slug:
-            queryset = queryset.filter(tags__slug=tag_slug)
+        if tag_name:
+            queryset = queryset.filter(tags__name=tag_name)
         
         if sort == 'oldest':
             queryset = queryset.order_by('created_at')
