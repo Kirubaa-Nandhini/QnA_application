@@ -23,18 +23,14 @@
                         class="appearance-none rounded-md relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                         placeholder="{{ field.label }}">
                     {% if field.errors %}
-                        {% for error in field.errors %}
-                        <p class="text-rose-500 text-xs mt-1">{{ error }}</p>
-                        {% endfor %}
+                    <p class="text-rose-500 text-xs mt-1">{{ field.errors.0 }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
 
             {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                <div class="text-rose-500 text-sm p-3 bg-rose-50 rounded-lg mb-4">{{ error }}</div>
-                {% endfor %}
+            <div class="text-rose-500 text-sm p-3 bg-rose-50 rounded-lg">{{ form.non_field_errors.0 }}</div>
             {% endif %}
 
             <div class="flex items-center justify-between">
