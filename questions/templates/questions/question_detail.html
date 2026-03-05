@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load markdown_extras %}
+{% load static %}
+
+{% block extra_head %}
+{% include 'includes/markdown_editor_setup.html' %}
+{% endblock %}
 
 {% block title %}{{ question.title }} - Q&A Platform{% endblock %}
 
@@ -25,8 +31,8 @@
 
         <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight mb-6">{{ question.title }}</h1>
 
-        <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed text-lg mb-8">
-            {{ question.description }}
+        <div class="prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed text-lg mb-8">
+            {{ question.description|markdownify }}
         </div>
 
 
@@ -38,7 +44,6 @@
                 <div>
                     <p class="text-slate-900 font-bold">{{ question.author.username }}</p>
                     <p class="text-slate-500 text-xs font-medium">Member since {{ question.author.date_joined|date:"M Y"}}
-                       
                     </p>
                 </div>
             </div>
@@ -54,20 +59,79 @@
         </div>
     </div>
 
-    <!-- Placeholder for Answers -->
+    <!-- Answers List -->
     <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-slate-900 px-4">0 Answers</h2>
-        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-16 text-center">
-            <p class="text-slate-400 font-medium mb-4">No answers yet. Share your knowledge!</p>
-            {% if user.is_authenticated %}
-            <button
-                class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">Post
-                an Answer</button>
-            {% else %}
-            <a href="{% url 'login' %}?next={{ request.path }}" class="text-indigo-600 font-bold hover:underline">Log in
-                to answer</a>
-            {% endif %}
+        <h2 class="text-2xl font-bold text-slate-900 px-4">{{ question.answers.count }} Answers</h2>
+
+        {% for answer in question.answers.all %}
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition group">
+            <div class="prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed mb-6">
+                {{ answer.content|markdownify }}
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm">
+                        {{ answer.author.username.0|upper }}
+                    </div>
+                    <div>
+                        <p class="text-slate-900 font-bold text-xs">{{ answer.author.username }}</p>
+                        <p class="text-slate-400 text-[10px]">{{ answer.created_at|timesince }} ago</p>
+                    </div>
+                </div>
+
+                {% if user == answer.author %}
+                <div class="flex space-x-2">
+                    <a href="{% url 'answer_update' answer.pk %}"
+                        class="text-xs font-bold text-slate-400 hover:text-indigo-600 transition">Edit</a>
+                    <a href="{% url 'answer_delete' answer.pk %}"
+                        class="text-xs font-bold text-slate-400 hover:text-rose-600 transition">Delete</a>
+                </div>
+                {% endif %}
+            </div>
         </div>
+        {% empty %}
+        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
+            <p class="text-slate-400 font-medium">No answers yet. Share your knowledge!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Post Answer Form -->
+    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+        <h3 class="text-xl font-bold text-slate-900 mb-6">Your Answer</h3>
+        {% if user.is_authenticated %}
+        <form action="{% url 'answer_create' question.pk %}" method="POST" class="space-y-4">
+            {% csrf_token %}
+            {% for field in answer_form %}
+            <div class="relative group">
+                <textarea name="{{ field.name }}" id="id_content"
+                    class="markdown-editor w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    rows="5" placeholder="Write your answer here..."></textarea>
+
+                {% if field.errors %}
+                {% for error in field.errors %}
+                <p class="text-rose-500 text-xs mt-1 font-bold">{{ error }}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit"
+                class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">
+                Post Your Answer
+            </button>
+        </form>
+
+        {% else %}
+        <div class="text-center py-4">
+            <p class="text-slate-500 mb-4">You must be logged in to answer this question.</p>
+            <a href="{% url 'login' %}?next={{ request.path }}"
+                class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">
+                Login to Answer
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

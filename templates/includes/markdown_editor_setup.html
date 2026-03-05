@@ -1,0 +1,94 @@
+<!-- EasyMDE CSS -->
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<style>
+    /* Customizing EasyMDE to match the app's aesthetic */
+    .EasyMDEContainer .editor-toolbar {
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .EasyMDEContainer .editor-toolbar button {
+        border-radius: 6px;
+        margin-right: 2px;
+    }
+
+    .EasyMDEContainer .editor-toolbar button:hover {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+    }
+
+    .EasyMDEContainer .editor-toolbar button.active {
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        color: #4f46e5;
+    }
+
+    .EasyMDEContainer .CodeMirror {
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 1rem;
+        min-height: 250px;
+        padding: 10px;
+        color: #1e293b;
+        background: #fff;
+    }
+
+    .EasyMDEContainer .CodeMirror-focused {
+        border: 1px solid #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        outline: none;
+    }
+
+    .EasyMDEContainer .editor-preview-active,
+    .EasyMDEContainer .editor-preview-side {
+        background: #fff;
+        padding: 2rem;
+    }
+
+    /* Simple list continuation fix is built-in to EasyMDE (CodeMirror) */
+</style>
+<!-- EasyMDE JS -->
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll('.markdown-editor');
+        textareas.forEach(textarea => {
+            const easymde = new EasyMDE({
+                element: textarea,
+                spellChecker: false,
+                autosave: {
+                    enabled: false,
+                },
+                status: false,
+                placeholder: textarea.getAttribute('placeholder') || "Write your content here...",
+                forceSync: true,
+                toolbar: [
+                    "bold", "italic", "heading", "|",
+                    "quote", "unordered-list", "ordered-list", "|",
+                    "link", "image", "code"
+                ],
+                tabSize: 4,
+                indentWithTabs: false,
+                lineWrapping: true,
+                renderingConfig: {
+                    singleLineBreaks: false,
+                    codeSyntaxHighlighting: true,
+                },
+                shortcuts: {
+                    "toggleUnorderedList": "Cmd-Opt-L", // Custom shortcuts if needed
+                }
+            });
+
+            // Sync EasyMDE content back to textarea on change for Django form submission
+            easymde.codemirror.on("change", function () {
+                textarea.value = easymde.value();
+            });
+        });
+    });
+</script>

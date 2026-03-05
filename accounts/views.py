@@ -32,10 +32,9 @@ class ProfileView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Placeholder stats (Questions/Answers count)
-        # These can be updated once Question/Answer models are implemented
-        context['questions_count'] = getattr(self.request.user, 'questions', None).count() if hasattr(self.request.user, 'questions') else 0
-        context['answers_count'] = getattr(self.request.user, 'answers', None).count() if hasattr(self.request.user, 'answers') else 0
+        # Real statistics for questions and answers
+        context['questions_count'] = self.request.user.questions.count()
+        context['answers_count'] = self.request.user.answers.count()
         return context
 
 @login_required

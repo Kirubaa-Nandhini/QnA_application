@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Answer - Q&A Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-12">
+    <div class="bg-white p-10 rounded-3xl shadow-xl border border-rose-100 text-center">
+        <div class="bg-rose-50 h-20 w-20 rounded-full flex items-center justify-center text-rose-600 mx-auto mb-8">
+            <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-black text-slate-900 mb-4 tracking-tight">Are you sure?</h1>
+        <p class="text-slate-500 text-lg mb-10 leading-relaxed font-medium">This action cannot be undone. You are about
+            to delete your answer.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="{% url 'question_detail' object.question.pk %}"
+                    class="w-full sm:w-auto px-8 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">Cancel</a>
+                <button type="submit"
+                    class="w-full sm:w-auto px-10 py-3 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 transition shadow-lg transform hover:-translate-y-0.5">Yes,
+                    Delete permanently</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
