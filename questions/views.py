@@ -1,11 +1,86 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from .models import Question, Tag, Answer
+from django.http import JsonResponse
+from django.contrib.contenttypes.models import ContentType
+from .models import Question, Tag, Answer, Vote, Comment
 from .forms import QuestionForm, AnswerForm
 
+from django.db import models
 from django.db.models import Count
+
+class VoteToggleView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        content_type_id = request.POST.get('content_type_id')
+        object_id = request.POST.get('object_id')
+        
+        try:
+            vote_value = int(request.POST.get('value', 0))
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'Invalid vote value'}, status=400)
+
+        if vote_value not in [1, -1]:
+            return JsonResponse({'error': 'Invalid vote value'}, status=400)
+
+        content_type = get_object_or_404(ContentType, id=content_type_id)
+        obj = get_object_or_404(content_type.model_class(), id=object_id)
+
+        # check if it is the author trying to vote
+        if hasattr(obj, 'author') and obj.author == request.user:
+            return JsonResponse({'error': 'You cannot vote on your own content'}, status=403)
+
+        vote, created = Vote.objects.get_or_create(
+            user=request.user,
+            content_type=content_type,
+            object_id=object_id,
+            defaults={'value': vote_value}
+        )
+
+        if not created:
+            if vote.value == vote_value:
+                # toggle off if same value
+                vote.delete()
+                action = 'removed'
+            else:
+                # change vote value
+                vote.value = vote_value
+                vote.save()
+                action = 'changed'
+        else:
+            action = 'added'
+
+        return JsonResponse({
+            'score': obj.score,
+            'action': action
+        })
+
+class CommentCreateView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        content_type_id = request.POST.get('content_type_id')
+        object_id = request.POST.get('object_id')
+        content = request.POST.get('content', '').strip()
+        parent_id = request.POST.get('parent_id')
+
+        if not content:
+            return redirect(request.META.get('HTTP_REFERER', 'question_list'))
+
+        content_type = get_object_or_404(ContentType, id=content_type_id)
+        
+        parent_comment = None
+        if parent_id and str(parent_id).isdigit():
+            parent_comment = Comment.objects.filter(id=parent_id).first()
+
+        Comment.objects.create(
+            user=request.user,
+            content_type=content_type,
+            object_id=object_id,
+            content=content,
+            parent=parent_comment
+        )
+
+        return redirect(request.META.get('HTTP_REFERER', 'question_list'))
 
 class QuestionListView(ListView):
     model = Question
@@ -15,7 +90,8 @@ class QuestionListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset().annotate(
-            num_answers=Count('answers')
+            num_answers=Count('answers', distinct=True),
+            total_score=models.Sum('votes__value')
         )
         tag_name = self.request.GET.get('tag')
         sort = self.request.GET.get('sort', 'newest')
@@ -44,7 +120,28 @@ class QuestionDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        question = self.get_object()
+        user = self.request.user
+        
         context['answer_form'] = AnswerForm()
+        context['question_ct'] = ContentType.objects.get_for_model(Question).id
+        context['answer_ct'] = ContentType.objects.get_for_model(Answer).id
+        
+        # Performance: Pre-fetch current user's votes to avoid N+1 problem in template
+        user_votes = {}
+        if user.is_authenticated:
+            # Fetch votes for the question
+            q_vote = Vote.objects.filter(user=user, content_type_id=context['question_ct'], object_id=question.id).first()
+            if q_vote:
+                user_votes[f"q_{question.id}"] = q_vote.value
+                
+            # Fetch votes for all answers in one query
+            answer_ids = question.answers.values_list('id', flat=True)
+            a_votes = Vote.objects.filter(user=user, content_type_id=context['answer_ct'], object_id__in=answer_ids)
+            for v in a_votes:
+                user_votes[f"a_{v.object_id}"] = v.value
+                
+        context['user_votes'] = user_votes
         return context
 
 class QuestionCreateView(LoginRequiredMixin, CreateView):

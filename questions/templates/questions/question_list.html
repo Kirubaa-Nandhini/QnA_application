@@ -81,7 +81,7 @@
                 </div>
                 <div class="flex space-x-4 font-bold text-slate-400">
                     <span>{{ question.num_answers }} Answers</span>
-                    <span>0 Votes</span>
+                    <span>{{ question.total_score|default:0 }} Votes</span>
                 </div>
             </div>
         </div>

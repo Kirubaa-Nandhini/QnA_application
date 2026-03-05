@@ -11,38 +11,52 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+
 @register.filter(name='markdownify')
 def markdownify(text):
     if not text:
         return ""
-    
-    # Pre-processing: Ensure a blank line before lists if they follow text
-    # This addresses the strictness of many Markdown parsers where lists 
-    # must be preceded by a blank line to be recognized as blocks.
-    # regex matches: (not a newline) + newline + (list marker)
+
+    # Ensure blank line before lists for proper markdown parsing
     text = re.sub(r'([^\n])\n(\s*[\*\-\+] )', r'\1\n\n\2', text)
     text = re.sub(r'([^\n])\n(\s*\d+\. )', r'\1\n\n\2', text)
 
     try:
         if USE_MARKDOWN2:
-            html = markdown2.markdown(text, extras=[
-                'fenced-code-blocks', 
-                'tables', 
-                'sane-lists',
-                'header-ids',
-                'task_lists',
-                'strike',
-                'code-friendly'
-            ])
-            return mark_safe(html)
+            html = markdown2.markdown(
+                text,
+                extras=[
+                    "fenced-code-blocks",
+                    "tables",
+                    "sane-lists",
+                    "header-ids",
+                    "task_lists",
+                    "strike",
+                    "code-friendly",
+                ],
+            )
         else:
-            # Removed 'nl2br' as it can sometimes conflict with list detection
-            # by turning functional newlines into literal <br> tags within a paragraph
-            html = markdown.markdown(text, extensions=['extra', 'codehilite', 'sane_lists', 'smarty'])
-            return mark_safe(html)
-    except Exception as e:
-        # Final fallback
+            html = markdown.markdown(
+                text,
+                extensions=["extra", "codehilite", "sane_lists", "smarty"],
+            )
+
+        return mark_safe(html)
+
+    except Exception:
+        # Final fallback if advanced markdown parsing fails
         if USE_MARKDOWN2:
             return mark_safe(markdown2.markdown(text))
         else:
             return mark_safe(markdown.markdown(text))
+
+
+@register.filter(name='get_user_vote')
+def get_user_vote(obj, user):
+    if hasattr(obj, "get_user_vote"):
+        return obj.get_user_vote(user)
+    return 0
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
