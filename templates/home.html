@@ -19,15 +19,16 @@
     </div>
     {% else %}
     <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-        <p class="text-lg text-slate-700 font-medium mb-6">Welcome back, <span class="text-indigo-600">{{ user.username}}
-                </span>!</p>
+        <p class="text-lg text-slate-700 font-medium mb-6">Welcome back, <span class="text-indigo-600">
+                {{ user.username }}
+            </span>!</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            <a href="#"
+            <a href="{% url 'question_list' %}"
                 class="p-6 bg-slate-50 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition group">
                 <h3 class="font-bold text-slate-900 group-hover:text-indigo-600">Browse Questions</h3>
                 <p class="text-sm text-slate-500">Explore what the community is asking.</p>
             </a>
-            <a href="#"
+            <a href="{% url 'question_create' %}"
                 class="p-6 bg-slate-50 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition group">
                 <h3 class="font-bold text-slate-900 group-hover:text-emerald-600">Ask a Question</h3>
                 <p class="text-sm text-slate-500">Get answers from the community.</p>
