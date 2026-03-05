@@ -16,6 +16,8 @@ register = template.Library()
 def markdownify(text):
     if not text:
         return ""
+    
+    text = str(text)
 
     # Ensure blank line before lists for proper markdown parsing
     text = re.sub(r'([^\n])\n(\s*[\*\-\+] )', r'\1\n\n\2', text)
@@ -59,4 +61,6 @@ def get_user_vote(obj, user):
 
 @register.filter
 def get_item(dictionary, key):
+    if dictionary is None or not hasattr(dictionary, 'get'):
+        return None
     return dictionary.get(key)
