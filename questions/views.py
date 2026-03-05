@@ -106,7 +106,10 @@ class QuestionListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tags'] = Tag.objects.all()
+        # Fetch only the top 10 most used tags
+        context['tags'] = Tag.objects.annotate(
+            num_questions=Count('questions')
+        ).order_by('-num_questions')[:10]
         context['current_sort'] = self.request.GET.get('sort', 'newest')
         context['current_tag'] = self.request.GET.get('tag', '')
         context['current_query'] = self.request.GET.get('q', '')

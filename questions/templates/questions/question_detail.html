@@ -4,7 +4,6 @@
 
 {% block extra_head %}
 {% include 'includes/markdown_editor_setup.html' %}
-<script src="{% static 'js/markdown_editor.js' %}"></script>
 <script src="{% static 'js/community_engagement.js' %}"></script>
 {% endblock %}
 
@@ -14,23 +13,23 @@
 <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
     <!-- Main Content Area -->
     <div class="flex-1 space-y-6">
-        <!-- Question Section -->
-        <article class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
-            <!-- Tags -->
+        <!-- Question Header -->
+        <div
+            class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div class="flex flex-wrap gap-2 mb-4">
                 {% for tag in question.tags.all %}
                 <span
-                    class="bg-slate-50 text-slate-500 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                    {{ tag.name|lower }}
+                    class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors">
+                    {{ tag.name }}
                 </span>
                 {% endfor %}
             </div>
 
             <!-- Title & Share -->
             <div class="flex items-start justify-between gap-4 mb-4">
-                <h1 class="text-3xl font-black text-slate-900 leading-tight">{{ question.title }}</h1>
+                <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100 leading-tight transition-colors">{{ question.title }}</h1>
                 <button type="button" onclick="copyToClipboard('{{ request.build_absolute_uri }}', this)"
-                    class="flex-shrink-0 p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all duration-200 group"
+                    class="flex-shrink-0 p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full transition-all duration-200 group"
                     title="Share question">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -41,12 +40,14 @@
             </div>
 
             <!-- Description -->
-            <div class="prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed text-lg mb-8">
+            <div
+                class="prose prose-slate dark:prose-invert prose-indigo max-w-none text-slate-700 dark:text-slate-300 leading-relaxed text-lg mb-8 transition-colors">
                 {{ question.description|markdownify }}
             </div>
 
-            <!-- Question Action Bar -->
-            <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+            <!-- Action Bar: Grouped Voting & Share -->
+            <div
+                class="flex items-center justify-between mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
                 <div class="flex items-center space-x-6">
                     {% with q_id=question.id|stringformat:"s" %}
                     {% with vote_key="q_"|add:q_id %}
@@ -66,55 +67,64 @@
             </div>
 
             <!-- Author Info Row -->
-            <div class="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between">
+            <div
+                class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
                 <div class="flex items-center space-x-4">
                     <div
-                        class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-indigo-600 font-black text-xl">
+                        class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xl transition-colors">
                         {{ question.author.username.0|upper }}
                     </div>
                     <div>
-                        <p class="text-slate-900 font-bold">{{ question.author.username }}</p>
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Asked {{ question.created_at|date:"M d, Y" }}</p>
+                        <p class="text-slate-900 dark:text-slate-100 font-bold transition-colors">
+                           {{question.author.username }}</p>
+                        <p
+                            class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider transition-colors">
+                            Asked {{ question.created_at|date:"M d, Y" }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Question Comments Section -->
-            <div class="mt-8">
+            <div class="mt-8 border-t border-slate-100 dark:border-slate-800 pt-6">
                 {% include 'questions/includes/comment_section.html' with obj=question content_type_id=question_ct comments=question.comments.all %}
             </div>
-        </article>
+        </div>
 
         <!-- Answers Header -->
-        <div class="px-2 mt-8 flex items-center justify-between">
-            <h2 class="text-xl font-black text-slate-900">{{ question.answers.count }} Answers</h2>
+        <div class="px-2">
+            <h2 class="text-lg font-black text-slate-900 dark:text-slate-100 transition-colors">{{ question.answers.count }} Answers</h2>
         </div>
 
         <!-- Answers List -->
         <div class="space-y-6">
             {% for answer in question.answers.all %}
-            <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm relative">
-                <!-- Answer Author Header -->
+            <div
+                class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+                <!-- Answer Author Header (Quora style) -->
                 <div class="flex items-center space-x-3 mb-6">
                     <div
-                        class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-indigo-600 font-black text-lg shadow-sm">
+                        class="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-lg transition-colors">
                         {{ answer.author.username.0|upper }}
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm font-black text-slate-900">{{ answer.author.username }}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">• Answered {{ answer.created_at|date:"M d, Y" }}</span>
+                            <span
+                                class="text-sm font-black text-slate-900 dark:text-slate-100 hover:underline cursor-pointer transition-colors">
+                                {{answer.author.username }}</span>
+                            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-bold transition-colors">•
+                                Answered {{ answer.created_at|date:"M d,Y"}}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Answer Content -->
-                <div class="prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed mb-8">
+                <div
+                    class="prose prose-slate dark:prose-invert prose-indigo max-w-none text-slate-700 dark:text-slate-300 leading-relaxed mb-8 transition-colors">
                     {{ answer.content|markdownify }}
                 </div>
 
                 <!-- Answer Action Bar -->
-                <div class="flex items-center justify-between pt-6 border-t border-slate-50">
+                <div
+                    class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800 transition-colors">
                     <div class="flex items-center space-x-6">
                         {% with a_id=answer.id|stringformat:"s" %}
                         {% with vote_key="a_"|add:a_id %}
@@ -135,25 +145,28 @@
 
                 <!-- Answer Comments Section -->
                 {% include 'questions/includes/comment_section.html' with obj=answer content_type_id=answer_ct comments=answer.comments.all %}
-            </section>
+            </div>
             {% empty %}
-            <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
-                <p class="text-slate-400 font-medium">No answers yet. Share your knowledge!</p>
+            <div
+                class="bg-slate-50 dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center transition-colors">
+                <p class="text-slate-400 dark:text-slate-500 font-medium">No answers yet. Share your knowledge!</p>
             </div>
             {% endfor %}
         </div>
 
         <!-- Post Answer Form -->
-        <div id="answer-form" class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 scroll-mt-24">
+        <div
+            class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
             <div class="flex items-center space-x-3 mb-6">
                 {% if user.is_authenticated %}
                 <div
-                    class="w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm shadow-sm">
+                    class="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm transition-colors">
                     {{ user.username.0|upper }}
                 </div>
-                <span class="text-sm font-black text-slate-900">{{ user.username }}, answer this question...</span>
+                <span class="text-sm font-black text-slate-900 dark:text-slate-100 transition-colors">{{ user.username }}, answer this question...</span>
                 {% else %}
-                <span class="text-sm font-black text-slate-900">Sign in to answer</span>
+                <span class="text-sm font-black text-slate-900 dark:text-slate-100 transition-colors">Sign in to
+                    answer</span>
                 {% endif %}
             </div>
 
@@ -161,16 +174,18 @@
             <form action="{% url 'answer_create' question.pk %}" method="POST" class="space-y-4">
                 {% csrf_token %}
                 {% for field in answer_form %}
-                <div class="relative group">
-                    <textarea name="{{ field.name }}" id="id_content"
-                        class="markdown-editor w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-inner"
-                        rows="6" placeholder="Write your detailed answer here..."></textarea>
-
+                <div class="space-y-2">
                     {% if field.errors %}
                     {% for error in field.errors %}
-                    <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ error }}</p>
+                    <p class="text-rose-500 text-[10px] font-bold">{{ error }}</p>
                     {% endfor %}
                     {% endif %}
+
+                    <div class="relative group">
+                        <textarea name="{{ field.name }}" id="id_content"
+                            class="markdown-editor w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-4 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder-slate-400 dark:placeholder-slate-600 shadow-inner"
+                            rows="6" placeholder="Write your detailed answer here..."></textarea>
+                    </div>
                 </div>
                 {% endfor %}
                 <div class="flex justify-end pt-2">
@@ -198,25 +213,21 @@
 
     <!-- Sidebar -->
     <aside class="w-full lg:w-80 space-y-6">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-24">
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-50 pb-2">
-                Related Questions</h3>
-            <div class="space-y-6">
+        <div
+            class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm sticky top-24 transition-colors">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Related Questions</h3>
+            <div class="space-y-4">
                 {% for related in related_questions %}
                 <div class="group">
                     <a href="{% url 'question_detail' related.pk %}"
-                        class="text-sm font-bold text-slate-800 hover:text-indigo-600 transition leading-snug line-clamp-2 mb-2">
+                        class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition leading-snug line-clamp-2">
                         {{ related.title }}
                     </a>
                     <div
-                        class="flex items-center space-x-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        <span class="flex items-center gap-1">
-                            <span class="text-indigo-600">{{ related.score }}</span> Votes
-                        </span>
-                        <span class="text-slate-200">•</span>
-                        <span class="flex items-center gap-1">
-                            <span class="text-indigo-600">{{ related.answers.count }}</span> Answers
-                        </span>
+                        class="flex items-center space-x-2 mt-2 text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider transition-colors">
+                        <span>{{ related.score }} Votes</span>
+                        <span class="text-slate-200 dark:text-slate-800">•</span>
+                        <span>{{ related.answers.count }} Answers</span>
                     </div>
                 </div>
                 {% empty %}
