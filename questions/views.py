@@ -11,6 +11,8 @@ from .forms import QuestionForm, AnswerForm
 from django.db import models
 from django.db.models import Count, Q, Sum
 
+from .filters import QuestionFilter
+
 class VoteToggleView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         content_type_id = request.POST.get('content_type_id')
@@ -93,23 +95,11 @@ class QuestionListView(ListView):
             num_answers=Count('answers', distinct=True),
             total_score=Sum('votes__value')
         )
-        tag_name = self.request.GET.get('tag')
-        sort = self.request.GET.get('sort', 'newest')
-        query = self.request.GET.get('q')
         
-        if query:
-            queryset = queryset.filter(
-                Q(title__icontains=query) | 
-                Q(description__icontains=query) |
-                Q(tags__name__icontains=query)
-            ).distinct()
-
-        if tag_name:
-            queryset = queryset.filter(tags__name=tag_name)
+        self.filterset = QuestionFilter(self.request.GET, queryset=queryset)
+        queryset = self.filterset.qs
         
-        if sort == 'oldest':
-            queryset = queryset.order_by('created_at')
-        else:
+        if not self.request.GET.get('sort'):
             queryset = queryset.order_by('-created_at')
             
         return queryset
@@ -120,6 +110,7 @@ class QuestionListView(ListView):
         context['current_sort'] = self.request.GET.get('sort', 'newest')
         context['current_tag'] = self.request.GET.get('tag', '')
         context['current_query'] = self.request.GET.get('q', '')
+        context['filter'] = getattr(self, 'filterset', None)
         return context
 
 class QuestionDetailView(DetailView):
@@ -156,8 +147,9 @@ class QuestionDetailView(DetailView):
         related_questions = Question.objects.filter(
             tags__in=question.tags.all()
         ).exclude(id=question.id).annotate(
-            num_shared_tags=Count('tags')
-        ).select_related('author').prefetch_related('tags', 'answers').order_by('-num_shared_tags', '-created_at').distinct()[:5]
+            num_shared_tags=Count('id')
+        ).select_related('author').prefetch_related('tags', 'answers')\
+        .order_by('-num_shared_tags', '-created_at')[:5]
         
         context['related_questions'] = related_questions
         return context
