@@ -2,7 +2,7 @@
     <div id="comment-trigger-{{ obj.id }}" class="flex items-center justify-between group cursor-pointer"
         onclick="toggleComments('comments-{{ content_type_id }}-{{ obj.id }}')">
         <span class="text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition tracking-tight">
-            {{ comments|length }} comments
+            {{ comments.count }} comments
         </span>
         <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition" fill="none" stroke="currentColor"
             viewBox="0 0 24 24">
@@ -12,29 +12,78 @@
 
     <div id="comments-{{ content_type_id }}-{{ obj.id }}"
         class="hidden mt-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
+        <!-- Root Comments -->
         {% for comment in comments %}
-        <div class="flex space-x-3 group/comment">
-            <div
-                class="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-bold text-slate-600">
-                {{ comment.user.username.0|upper }}
-            </div>
-            <div class="flex-1 space-y-1">
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-bold text-slate-900">{{ comment.user.username }}</span>
-                    <span class="text-[10px] text-slate-400">• {{ comment.created_at|timesince }} ago</span>
+        {% if not comment.parent %}
+        <div class="space-y-4">
+            <div class="flex space-x-3 group/comment">
+                <div
+                    class="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-bold text-slate-600">
+                    {{ comment.user.username.0|upper }}
                 </div>
-                <p class="text-sm text-slate-600 leading-relaxed">{{ comment.content }}</p>
+                <div class="flex-1 space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-bold text-slate-900">{{ comment.user.username }}</span>
+                        <span class="text-[10px] text-slate-400">• {{ comment.created_at|timesince }} ago</span>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">{{ comment.content }}</p>
+
+                    {% if user.is_authenticated %}
+                    <button onclick="toggleReplyForm('{{ comment.id }}')"
+                        class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 uppercase tracking-wider transition">
+                        Reply
+                    </button>
+
+                    <!-- Reply Form (Hidden) -->
+                    <form id="reply-form-{{ comment.id }}" action="{% url 'comment_create' %}" method="POST"
+                        class="hidden mt-3 max-w-md">
+                        {% csrf_token %}
+                        <input type="hidden" name="content_type_id" value="{{ content_type_id }}">
+                        <input type="hidden" name="object_id" value="{{ obj.id }}">
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <div
+                            class="flex items-center space-x-2 bg-white rounded-xl border border-slate-200 p-1.5 shadow-sm">
+                            <input type="text" name="content" placeholder="Write a reply..."
+                                class="flex-1 bg-transparent border-none text-xs text-slate-600 focus:outline-none focus:ring-0 px-2">
+                            <button type="submit"
+                                class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition">
+                                Reply
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Replies -->
+            <div class="ml-11 space-y-4 border-l-2 border-slate-50 pl-4">
+                {% for reply in comment.replies.all %}
+                <div class="flex space-x-3 group/reply">
+                    <div
+                        class="flex-shrink-0 w-6 h-6 bg-slate-50 rounded-full flex items-center justify-center text-[8px] font-bold text-slate-500">
+                        {{ reply.user.username.0|upper }}
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-slate-900">{{ reply.user.username }}</span>
+                            <span class="text-[9px] text-slate-400">• {{ reply.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">{{ reply.content }}</p>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
         {% endfor %}
 
         {% if user.is_authenticated %}
-        <form action="{% url 'comment_create' %}" method="POST" class="mt-4">
+        <form action="{% url 'comment_create' %}" method="POST" class="mt-4 border-t border-slate-50 pt-4">
             {% csrf_token %}
             <input type="hidden" name="content_type_id" value="{{ content_type_id }}">
             <input type="hidden" name="object_id" value="{{ obj.id }}">
             <div
-                class="flex items-center space-x-3 bg-slate-50 rounded-full border border-slate-200 px-4 py-1.5 focus-within:ring-2 focus-within:ring-indigo-100 transition">
+                class="flex items-center space-x-3 bg-slate-50 rounded-xl border border-slate-200 px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-100 transition shadow-inner">
                 <input type="text" name="content" placeholder="Add a comment..."
                     class="flex-1 bg-transparent border-none text-sm text-slate-600 focus:outline-none focus:ring-0">
                 <button type="submit" class="text-indigo-600 text-sm font-bold hover:text-indigo-800 transition">
