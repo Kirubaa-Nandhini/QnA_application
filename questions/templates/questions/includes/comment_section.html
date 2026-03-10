@@ -3,7 +3,7 @@
         onclick="toggleComments('comments-{{ content_type_id }}-{{ obj.id }}')">
         <span
             class="text-xs font-bold text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition tracking-tight">
-            {{ comments|length }} comments
+            {{ comments.count }} comments
         </span>
         <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition"
             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,10 +24,11 @@
                 </div>
                 <div class="flex-1 space-y-1">
                     <div class="flex items-center space-x-2">
-                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100 transition-colors">{{ comment.user.username }}</span>
-                        <span class="text-[10px] text-slate-400 dark:text-slate-500">• {{ comment.created_at|timesince}} ago</span>
+                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100 transition-colors">{{comment.user.username }}</span>
+                        <span class="text-[10px] text-slate-400 dark:text-slate-500">• {{ comment.created_at|timesince}}
+                            ago</span>
                     </div>
-                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed transition-colors">{{ comment.content }}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed transition-colors">{{comment.content }}</p>
 
                     {% if user.is_authenticated %}
                     <button onclick="toggleReplyForm('{{ comment.id }}')"
@@ -66,10 +67,10 @@
                     </div>
                     <div class="flex-1 space-y-1">
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-slate-900 dark:text-slate-100 transition-colors">{{ reply.user.username }}</span>
-                            <span class="text-[9px] text-slate-400 dark:text-slate-500">• {{ reply.created_at|timesince }} ago</span>
+                            <span class="text-xs font-bold text-slate-900 dark:text-slate-100 transition-colors">{{reply.user.username }}</span>
+                            <span class="text-[9px] text-slate-400 dark:text-slate-500">• {{ reply.created_at|timesince}} ago</span>
                         </div>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed transition-colors">{{ reply.content }}</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed transition-colors">{{reply.content }}</p>
                     </div>
                 </div>
                 {% endfor %}
