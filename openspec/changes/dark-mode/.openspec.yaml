@@ -1,0 +1,17 @@
+name: dark-mode
+description: "Implement system-wide Dark Mode with Tailwind CSS, including a theme toggle and persistence using localStorage"
+status: proposed
+artifacts:
+  proposal:
+    outputPath: proposal.md
+    status: todo
+  design:
+    outputPath: design.md
+    status: todo
+    dependencies: [proposal]
+  tasks:
+    outputPath: tasks.md
+    status: todo
+    dependencies: [design]
+apply:
+  requires: [tasks]
