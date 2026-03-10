@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db import transaction
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -76,8 +77,9 @@ class EditProfileView(LoginRequiredMixin, View):
              p_form = ProfileUpdateForm(request.POST, instance=profile)
 
         if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
+            with transaction.atomic():
+                u_form.save()
+                p_form.save()
             return redirect('profile')
 
         return render(request, self.template_name, {
