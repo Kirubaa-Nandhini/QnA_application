@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, View
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import SignupForm
-from .models import Profile
+
+User = get_user_model()
 
 class SignupView(CreateView):
     form_class = SignupForm
@@ -16,23 +16,19 @@ class SignupView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        # Create profile for new user
-        Profile.objects.create(user=self.object)
-        # Autologin after signup
         login(self.request, self.object)
         return response
 
-class ProfileView(DetailView):
-    model = Profile
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = User
     template_name = 'accounts/profile.html'
-    context_object_name = 'user_profile'
+    context_object_name = 'user_obj'
 
     def get_object(self):
-        return self.request.user.profile
+        return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Real statistics for questions and answers
         context['questions_count'] = self.request.user.questions.count()
         context['answers_count'] = self.request.user.answers.count()
         return context

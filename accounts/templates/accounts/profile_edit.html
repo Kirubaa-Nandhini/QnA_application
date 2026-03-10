@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Q&A Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4">
+    <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="p-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                <div>
+                    <h1 class="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Edit your profile</h1>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium italic text-lg opacity-80">Update your personal information and biography</p>
+                </div>
+                <div class="h-20 w-20 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-600/30">
+                    {{ user.username.0|upper }}
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-10">
+                {% csrf_token %}
+                
+                {% include 'includes/form_field.html' with field=form.username %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {% include 'includes/form_field.html' with field=form.first_name %}
+                    {% include 'includes/form_field.html' with field=form.last_name %}
+                </div>
+
+                {% include 'includes/form_field.html' with field=form.email %}
+                {% include 'includes/form_field.html' with field=form.bio %}
+
+                <div class="pt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl shadow-indigo-600/20 transition transform hover:-translate-y-1 w-full sm:w-auto">
+                        Save Changes
+                    </button>
+                    <a href="{% url 'profile' %}"
+                        class="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-2 border-slate-200 dark:border-slate-800 px-10 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition transform hover:-translate-y-1 w-full text-center sm:w-auto">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

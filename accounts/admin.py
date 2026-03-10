@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Profile
+from django.contrib.auth.admin import UserAdmin
+from .models import User
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'joined_date')
-    search_fields = ('user__username', 'user__email')
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('bio',)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('bio',)}),
+    )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
