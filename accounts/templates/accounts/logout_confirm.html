@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Logout Confirmation - Q&A Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-10 pb-24 px-4">
+    <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="p-10 text-center">
+            <div class="mb-8 flex justify-center">
+                <div class="h-20 w-20 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-4">Are you sure?</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium mb-10">
+                You are about to log out from your account. You will need to sign in again to post questions or vote.
+            </p>
+
+            <form method="POST" action="{% url 'logout' %}" class="space-y-4">
+                {% csrf_token %}
+                <button type="submit"
+                    class="w-full bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-rose-600/20 transition transform hover:-translate-y-1">
+                    Yes, log out
+                </button>
+                <a href="{{ request.META.HTTP_REFERER|default:'home' }}"
+                    class="block w-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-2 border-slate-200 dark:border-slate-800 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition transform hover:-translate-y-1">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
