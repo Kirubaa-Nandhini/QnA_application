@@ -112,6 +112,12 @@
                     <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
                         class="block w-full pl-10 {% if request.GET.q %}pr-10{% else %}pr-3{% endif %} py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm leading-5 placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 transition-all sm:text-sm shadow-inner-sm text-slate-900 dark:text-slate-100"
                         placeholder="Search questions, tags, or topics...">
+                    {% if request.GET.tag %}
+                    <input type="hidden" name="tag" value="{{ request.GET.tag }}">
+                    {% endif %}
+                    {% if request.GET.sort %}
+                    <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                    {% endif %}
                     {% if request.GET.q %}
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <a href="{% url 'question_list' %}{% query_transform q='' %}" class="text-slate-400 hover:text-rose-500 transition" title="Clear search">
