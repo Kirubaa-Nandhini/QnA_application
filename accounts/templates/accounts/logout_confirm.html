@@ -1,35 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Logout Confirmation - Q&A Platform{% endblock %}
+{% block title %}Logout - Q&A Platform{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto pt-10 pb-24 px-4">
-    <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 transition-colors">
-        <div class="p-10 text-center">
-            <div class="mb-8 flex justify-center">
-                <div class="h-20 w-20 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400">
-                    <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
+<div class="flex items-center justify-center min-h-[70vh] px-4">
+    <div class="w-full max-w-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-rose-50 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900 dark:text-slate-100">Sign out?</h1>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Confirm your logout</p>
+                    </div>
                 </div>
-            </div>
-            
-            <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-4">Are you sure?</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium mb-10">
-                You are about to log out from your account. You will need to sign in again to post questions or vote.
-            </p>
 
-            <form method="POST" action="{% url 'logout' %}" class="space-y-4">
-                {% csrf_token %}
-                <button type="submit"
-                    class="w-full bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-rose-600/20 transition transform hover:-translate-y-1">
-                    Yes, log out
-                </button>
-                <a href="{{ request.META.HTTP_REFERER|default:'home' }}"
-                    class="block w-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-2 border-slate-200 dark:border-slate-800 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition transform hover:-translate-y-1">
-                    Cancel
-                </a>
-            </form>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mb-8 leading-relaxed">
+                    You're about to end your current session. You'll need to sign back in to access your profile and post content.
+                </p>
+
+                <!-- Actions -->
+                <form method="POST" action="{% url 'logout' %}" class="space-y-3">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-lg shadow-rose-600/20">
+                        Log out
+                    </button>
+                    <a href="{{ request.META.HTTP_REFERER|default:'home' }}"
+                        class="block w-full text-center py-3 text-slate-500 dark:text-slate-400 font-medium text-sm hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                        Go back
+                    </a>
+                </form>
+            </div>
         </div>
     </div>
 </div>
