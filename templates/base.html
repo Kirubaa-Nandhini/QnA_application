@@ -139,11 +139,8 @@
                     <a href="{% url 'profile' %}"
                         class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">View
                         Profile</a>
-                    <form action="{% url 'logout' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <button type="submit"
-                            class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-rose-600 transition">Logout</button>
-                    </form>
+                    <a href="{% url 'logout' %}"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-rose-600 transition">Logout</a>
                     {% else %}
                     <a href="{% url 'login' %}"
                         class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Login</a>

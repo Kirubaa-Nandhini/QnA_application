@@ -44,7 +44,8 @@ class ProfileView(DetailView):
 def logout_user(request):
     if request.method == 'POST':
         logout(request)
-    return redirect('home')
+        return redirect('home')
+    return render(request, 'accounts/logout_confirm.html')
 
 class PasswordChangeManualView(PasswordChangeView):
     template_name = 'accounts/password_change.html'
