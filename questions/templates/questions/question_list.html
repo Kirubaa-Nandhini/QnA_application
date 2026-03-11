@@ -20,11 +20,13 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Sort By</label>
                     <div class="flex flex-col space-y-2">
-                        <a href="?sort=newest{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}"
-                            class="text-sm {% if current_sort == 'newest' %}text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400{% endif %} transition">Newest
+                        <a href="{% query_transform sort='' %}"
+                            class="text-sm {% if not request.GET.sort %}text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400{% endif %} transition">Default</a>
+                        <a href="{% query_transform sort='newest' %}"
+                            class="text-sm {% if current_sort == 'newest' and request.GET.sort %}text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400{% endif %} transition">Newest
                             First</a>
-                        <a href="?sort=oldest{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}"
-                            class="text-sm {% if current_sort == 'oldest' %}text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400{% endif %} transition">Oldest
+                        <a href="{% query_transform sort='oldest' %}"
+                            class="text-sm {% if current_sort == 'oldest' and request.GET.sort %}text-indigo-600 dark:text-indigo-400 font-bold{% else %}text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400{% endif %} transition">Oldest
                             First</a>
                     </div>
                 </div>
@@ -32,12 +34,17 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Popular Tags</label>
                     <div class="flex flex-wrap gap-2">
-                        <a href="?sort={{ current_sort }}{% if current_query %}&q={{ current_query }}{% endif %}"
-                            class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900 transition {% if not current_tag %}ring-2 ring-indigo-500{% endif %}">All</a>
+                        <a href="{% query_transform tag='' %}"
+                            class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900 transition {% if not current_tag %}ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/30{% endif %}">All</a>
                         {% for tag in tags %}
-                        <a href="?tag={{ tag.name }}&sort={{ current_sort }}{% if current_query %}&q={{ current_query }}{% endif %}"
-                            class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900 transition {% if current_tag == tag.name %}ring-2 ring-indigo-500{% endif %}">
+                        <a href="{% if current_tag == tag.name %}{% query_transform tag='' %}{% else %}{% query_transform tag=tag.name %}{% endif %}"
+                            class="inline-flex items-center px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900 transition {% if current_tag == tag.name %}ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/30{% endif %}">
                             {{ tag.name }}
+                            {% if current_tag == tag.name %}
+                            <span class="ml-1.5 flex items-center justify-center w-3 h-3 rounded-full bg-indigo-200 dark:bg-indigo-700 text-indigo-800 dark:text-indigo-200">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-2 h-2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </span>
+                            {% endif %}
                         </a>
                         {% endfor %}
                     </div>
@@ -50,13 +57,24 @@
     <!-- Question List -->
     <div class="w-full md:w-3/4 space-y-6">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center flex-wrap">
                 {% if current_query %}
-                Search results for <span class="italic text-indigo-600 dark:text-indigo-400">"{{ current_query }}"</span>
-                {% if current_tag %} under <span class="text-indigo-500 dark:text-indigo-400">{{ current_tag }}</span>
-                {%endif %}
+                Search results for <span class="italic text-indigo-600 dark:text-indigo-400 mx-2">"{{ current_query }}"</span>
+                <a href="{% query_transform q='' %}" class="inline-flex items-center text-slate-400 hover:text-rose-500 transition mr-4" title="Clear search">
+                    <svg class="w-5 h-5 border border-slate-200 dark:border-slate-800 rounded-full p-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
+                {% if current_tag %} 
+                <span class="text-slate-400 font-normal mr-2">under</span>
+                <span class="text-indigo-500 dark:text-indigo-400">{{ current_tag }}</span>
+                <a href="{% query_transform tag='' %}" class="inline-flex items-center ml-1 text-slate-400 hover:text-rose-500 transition" title="Clear tag filter">
+                    <svg class="w-4 h-4 border border-slate-200 dark:border-slate-800 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
+                {% endif %}
                 {% elif current_tag %}
-                Questions tagged with <span class="text-indigo-600 dark:text-indigo-400">"{{ current_tag }}"</span>
+                Questions tagged with <span class="text-indigo-600 dark:text-indigo-400 mx-2">"{{ current_tag }}"</span>
+                <a href="{% query_transform tag='' %}" class="inline-flex items-center text-slate-400 hover:text-rose-500 transition" title="Clear tag filter">
+                    <svg class="w-5 h-5 border border-slate-200 dark:border-slate-800 rounded-full p-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
                 {% else %}
                 All Questions
                 {% endif %}
