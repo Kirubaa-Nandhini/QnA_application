@@ -15,6 +15,23 @@ class SignupForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("A user with this email already exists.")
         return email
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'bio']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("A user with this email already exists.")
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username

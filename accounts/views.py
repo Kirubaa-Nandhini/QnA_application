@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect
+from django.db import transaction
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from .forms import SignupForm
 
 User = get_user_model()
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import SignupForm, UserUpdateForm
 
 class SignupView(CreateView):
     form_class = SignupForm
@@ -46,3 +49,12 @@ def logout_user(request):
 class PasswordChangeManualView(PasswordChangeView):
     template_name = 'accounts/password_change.html'
     success_url = reverse_lazy('password_change_done')
+
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserUpdateForm
+    template_name = 'accounts/profile_edit.html'
+    success_url = reverse_lazy('profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
