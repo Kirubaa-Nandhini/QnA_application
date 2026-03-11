@@ -6,8 +6,10 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.views.generic import CreateView, DetailView
 from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model
 from .forms import SignupForm
-from .models import Profile
+
+User = get_user_model()
 
 class SignupView(CreateView):
     form_class = SignupForm
@@ -16,19 +18,17 @@ class SignupView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        # Create profile for new user
-        Profile.objects.create(user=self.object)
         # Autologin after signup
         login(self.request, self.object)
         return response
 
 class ProfileView(DetailView):
-    model = Profile
+    model = User
     template_name = 'accounts/profile.html'
     context_object_name = 'user_profile'
 
     def get_object(self):
-        return self.request.user.profile
+        return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
